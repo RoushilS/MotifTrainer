@@ -53,6 +53,7 @@
     button.green { background: #22c55e; }
     button.purple { background: #a855f7; }
     button.next { background: #e5e7eb; }
+    button.randomize { background: #e5f7e1; }
     .result { margin-top: 8px; font-weight: 600; }
     .timer { margin-top: 4px; font-family: monospace; }
     .correct { color: #22c55e; }
@@ -66,6 +67,9 @@
     <div class="row">
       <div class="label">Motif (order matters)</div>
       <div id="motif" class="balls"></div>
+      <div class = "motifControls">
+        <button class = "randomize" onclick="randomizeMotif()">Randomize Motif</button>
+      </div>
     </div>
 
     <div class="row">
@@ -153,8 +157,12 @@
       }
     }
 
-    function init() {
+    function randomizeMotif() {
       motif = MOTIFS[Math.floor(Math.random() * MOTIFS.length)];
+      renderMotif()
+    }
+
+    function init() {
       const initialCount = Math.floor(Math.random() * 8+1); // 0–8
       gate = [];
       for (let i = 0; i < initialCount; i++) {
@@ -174,3 +182,4 @@
 </body>
 
 </html>
+
