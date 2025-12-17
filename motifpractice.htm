@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Motif Gate Trainer</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+    .app {
+      max-width: 720px;
+      width: 100%;
+      background: #020617;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+    h1 { margin-top: 0; font-size: 1.5rem; }
+    .row { margin: 16px 0; }
+    .label { font-size: 0.9rem; opacity: 0.8; margin-bottom: 6px; }
+    .balls { display: flex; gap: 10px; flex-wrap: wrap; }
+    .ball {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .purple { background: #a855f7; color: #020617; }
+    .green { background: #22c55e; color: #020617; }
+    .empty { background: transparent; color: rgba(255,255,255,0.6); border-style: dashed; }
+    .controls { display: flex; gap: 12px; margin-top: 12px; }
+    button {
+      flex: 1;
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      color: #020617;
+    }
+    button.green { background: #22c55e; }
+    button.purple { background: #a855f7; }
+    button.next { background: #e5e7eb; }
+    .result { margin-top: 8px; font-weight: 600; }
+    .timer { margin-top: 4px; font-family: monospace; }
+    .correct { color: #22c55e; }
+    .wrong { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>Three-Ball Motif Gate Trainer</h1>
+
+    <div class="row">
+      <div class="label">Motif (order matters)</div>
+      <div id="motif" class="balls"></div>
+    </div>
+
+    <div class="row">
+      <div class="label">9-Ball Gate (left → right)</div>
+      <div id="gate" class="balls"></div>
+    </div>
+
+    <div class="row">
+      <div class="label">What color should the <b>next</b> ball be?</div>
+      <div class="controls">
+        <button class="green" onclick="guess('G')">Green</button>
+        <button class="purple" onclick="guess('P')">Purple</button>
+        <button class="next" onclick="init()">Next</button>
+      </div>
+      <div id="result" class="result"></div>
+      <div id="timer" class="timer"></div>
+    </div>
+  </div>
+
+  <script>
+    const MOTIFS = [ ['P','P','G'], ['P','G','P'], ['G','P','P'] ];
+
+    let motif = [];
+    let gate = [];
+    let startTime = 0;
+    let timerInterval = null;
+
+    function ballEl(color, label) {
+      const d = document.createElement('div');
+      if (color === 'P') d.className = 'ball purple';
+      else if (color === 'G') d.className = 'ball green';
+      else d.className = 'ball empty';
+      d.textContent = label;
+      return d;
+    }
+
+    function renderMotif() {
+      const m = document.getElementById('motif');
+      m.innerHTML = '';
+      motif.forEach((c, i) => m.appendChild(ballEl(c, i + 1)));
+    }
+
+    function renderGate() {
+      const g = document.getElementById('gate');
+      g.innerHTML = '';
+      for (let i = 0; i < 9; i++) {
+        const label = i + 1;
+        if (i < gate.length) g.appendChild(ballEl(gate[i], label));
+        else g.appendChild(ballEl(null, label));
+      }
+    }
+
+    function expectedNextColor() {
+      return motif[gate.length % 3];
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      startTime = performance.now();
+      timerInterval = setInterval(updateTimer, 10);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+    }
+
+    function updateTimer() {
+      const elapsed = performance.now() - startTime;
+      const s = Math.floor(elapsed / 1000);
+      const ms = Math.floor(elapsed % 1000).toString().padStart(3, '0');
+      document.getElementById('timer').textContent = `Time: ${s}.${ms}s`;
+    }
+
+    function guess(color) {
+      const result = document.getElementById('result');
+      const expected = expectedNextColor();
+      stopTimer();
+
+      if (color === expected) {
+        result.textContent = 'Correct ✔';
+        result.className = 'result correct';
+      } else {
+        result.textContent = `Wrong ✘ (expected ${expected === 'G' ? 'Green' : 'Purple'})`;
+        result.className = 'result wrong';
+      }
+    }
+
+    function init() {
+      motif = MOTIFS[Math.floor(Math.random() * MOTIFS.length)];
+      const initialCount = Math.floor(Math.random() * 8+1); // 0–8
+      gate = [];
+      for (let i = 0; i < initialCount; i++) {
+        gate.push(Math.random() < 0.5 ? 'G' : 'P');
+      }
+
+      document.getElementById('result').textContent = '';
+      document.getElementById('timer').textContent = '';
+
+      renderMotif();
+      renderGate();
+      startTimer();
+    }
+
+    init();
+  </script>
+</body>
+</html>
