@@ -40,11 +40,13 @@
     .green { background: #22c55e; color: #020617; }
     .empty { background: transparent; color: rgba(255,255,255,0.6); border-style: dashed; }
     .controls { display: flex; gap: 12px; margin-top: 12px; }
+    .motifControls { display: flex; gap: 12px; margin-top: 12px; }
     button {
       flex: 1;
       padding: 12px;
       font-size: 1rem;
       border-radius: 12px;
+      max-width: 240px;
       border: none;
       cursor: pointer;
       font-weight: 600;
@@ -176,10 +178,11 @@
       renderGate();
       startTimer();
     }
-
+    randomizeMotif();
     init();
   </script>
 </body>
 
 </html>
+
 
